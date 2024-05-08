@@ -1,18 +1,38 @@
 import {Fragment, useState} from 'react';
 import './App.css';
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-  { id: 3, description: "Charger", quantity: 1, packed: true },
-];
+// const initialItems = [
+//   { id: 1, description: "Passports", quantity: 2, packed: false },
+//   { id: 2, description: "Socks", quantity: 12, packed: false },
+//   { id: 3, description: "Charger", quantity: 1, packed: true },
+// ];
 
 function App() {
+const [items,setItems] = useState([]);
+function handleAdd(item){
+  setItems((items)=>[...items,item]);
+}
+function handleDelete(idToDelete){
+  setItems(items.filter(items => items.id !== idToDelete))
+}
+function handleCheckbox(idToChecked,id){
+  setItems(items.map(item=> {
+    console.log(item.id === id);
+    if(item.id === id){
+      item.packed = !idToChecked;
+      console.log(item,"item1");
+      return item;
+    }
+    console.log(item,"item2");
+    return item;
+  }
+  ));
+}
 return(
   <Fragment>
     <Logo/>
-    <Form/>
-    <PackingList/>
-    <Stats/>
+    <Form onAdditem={handleAdd}/>
+    <PackingList items={items} handleDelete={handleDelete} handleCheckbox={handleCheckbox}/>
+    <Stats items={items}/>
   </Fragment>
 )
 
@@ -22,17 +42,18 @@ function Logo(){
     <h1>Far Away</h1>
   )
 }
-function Form(){
+function Form({onAdditem}){
   const [search,setSearch] = useState("");
   const [quantity,setQuantity] = useState(1);
-  function handleSubmit(e){
+
+      
+    function handleSubmit(e){
     e.preventDefault();
-    if(search.length){
+    if (!search.length) return;
       let newItems = {search , quantity , id: Math.ceil(Math.random() * 100000) , packed: false};
+      onAdditem(newItems);
       setSearch("");
       setQuantity(1);
-      console.log(newItems)
-    }
   }
   return(
     <div className="add-form" onSubmit={handleSubmit}>
@@ -45,29 +66,34 @@ function Form(){
     </div>
   )
 }
-function PackingList(){
+function PackingList({items,handleDelete,handleCheckbox}){
   return(
     <div className="list">
       <ul>
-        {initialItems.map(items=><Items items={items} key={items.id}/>)}
+        {items.map(items=><Items items={items} key={items.id} handleDelete={handleDelete} handleCheckbox={handleCheckbox}/>)}
       </ul>
     </div>
 
   )
 }
 
-function Items({items}){
-  // console.log(items);
+function Items({items,handleDelete,handleCheckbox}){
+  // console.log(items,"In list");
   return(
   <>
-    <li className={items.packed ? "strick": ""}>{items.quantity} {items.description}</li>
+    <li className={items.packed ? "strick": ""}><input type="checkbox" value={items.packed} onClick={()=>handleCheckbox(items.packed,items.id)}/>{items.quantity} {items.search}<span className="x_factor" onClick={()=>handleDelete(items.id)}>X</span></li>
   </>
   )
 
 }
-function Stats(){
+function Stats({items}){
+  let numItems = items.length;
+  let packeditem = items.filter(items => items.packed);
+  console.log(packeditem.length,"packeditem.length");
+  console.log(numItems,"numItems.length");
+  let percentagePackedItems = (packeditem.length/numItems)*100;
   return(
-    <div className="stats">You have X items in your list</div>
+    <div className="stats">{`You have ${numItems} items in your list and ${packeditem.length == 0? "0":percentagePackedItems}% has been Packed`}</div>
   )
 }
 export default App;

@@ -147,3 +147,18 @@ input[type="checkbox"] {
 .form_wrapper select, .form_wrapper input{
   margin-right: 15px;
 }
+.x_factor{
+  font-size: 20px;
+  color: red;
+  cursor: pointer;
+}
+.strick{
+  position: relative;
+}
+.strick::after{
+  content: "";
+  position: absolute;
+  border-bottom: 5px solid black;
+  top: 50%;
+  width: 30%;
+}
