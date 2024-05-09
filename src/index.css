@@ -162,3 +162,7 @@ input[type="checkbox"] {
   top: 50%;
   width: 30%;
 }
+.sort_wrapper{
+  text-align: center;
+  margin-top: 10px;
+}

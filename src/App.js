@@ -1,4 +1,4 @@
-import {Fragment, useState} from 'react';
+import React, {Fragment, useState} from 'react';
 import './App.css';
 // const initialItems = [
 //   { id: 1, description: "Passports", quantity: 2, packed: false },
@@ -8,15 +8,25 @@ import './App.css';
 
 function App() {
 const [items,setItems] = useState([]);
+const [sortValue,setSortValue] = useState("Input");
 function handleAdd(item){
   setItems((items)=>[...items,item]);
 }
 function handleDelete(idToDelete){
   setItems(items.filter(items => items.id !== idToDelete))
 }
+function handleSort(items,e){
+  let description = items.sort((a, b) => a.search.localeCompare(b.search));
+  let packedItems = items.sort((a, b) => (a.packed === b.packed) ? 0 : (a.packed ? 1 : -1));
+  console.log(description,"description");
+  console.log(packedItems,"packedItems");
+  setSortValue(e == 'Description' ? description : (e == 'Packed Items' ? packedItems : console.log("Input") ));
+  console.log(items,"itemsValue");
+  console.log(e);
+}
 function handleCheckbox(idToChecked,id){
   setItems(items.map(item=> {
-    console.log(item.id === id);
+    console.log(item);
     if(item.id === id){
       item.packed = !idToChecked;
       console.log(item,"item1");
@@ -33,6 +43,7 @@ return(
     <Form onAdditem={handleAdd}/>
     <PackingList items={items} handleDelete={handleDelete} handleCheckbox={handleCheckbox}/>
     <Stats items={items}/>
+    <Sort items={items} handleSort={handleSort}/>
   </Fragment>
 )
 
@@ -45,8 +56,7 @@ function Logo(){
 function Form({onAdditem}){
   const [search,setSearch] = useState("");
   const [quantity,setQuantity] = useState(1);
-
-      
+  
     function handleSubmit(e){
     e.preventDefault();
     if (!search.length) return;
@@ -89,11 +99,22 @@ function Items({items,handleDelete,handleCheckbox}){
 function Stats({items}){
   let numItems = items.length;
   let packeditem = items.filter(items => items.packed);
-  console.log(packeditem.length,"packeditem.length");
-  console.log(numItems,"numItems.length");
   let percentagePackedItems = (packeditem.length/numItems)*100;
   return(
     <div className="stats">{`You have ${numItems} items in your list and ${packeditem.length == 0? "0":percentagePackedItems}% has been Packed`}</div>
   )
+}
+function Sort({items,handleSort}){
+    return(
+      <React.Fragment>
+      <div className='sort_wrapper'>
+        <select onChange={(e)=>handleSort(items,e.target.value)}>
+          <option value="Input">Sort it by List</option>
+          <option value="Description">Sort it by Description</option>
+          <option value="Packed Items">Sort it by Packed Items</option>
+        </select>
+      </div>
+      </React.Fragment>
+    )
 }
 export default App;
