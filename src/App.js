@@ -8,21 +8,15 @@ import './App.css';
 
 function App() {
 const [items,setItems] = useState([]);
-const [sortValue,setSortValue] = useState("Input");
 function handleAdd(item){
   setItems((items)=>[...items,item]);
 }
 function handleDelete(idToDelete){
   setItems(items.filter(items => items.id !== idToDelete))
 }
-function handleSort(items,e){
-  let description = items.sort((a, b) => a.search.localeCompare(b.search));
-  let packedItems = items.sort((a, b) => (a.packed === b.packed) ? 0 : (a.packed ? 1 : -1));
-  console.log(description,"description");
-  console.log(packedItems,"packedItems");
-  setSortValue(e == 'Description' ? description : (e == 'Packed Items' ? packedItems : console.log("Input") ));
-  console.log(items,"itemsValue");
-  console.log(e);
+function handleClear() {
+  alert("Are you Sure you want to clear all ther items");
+  setItems([]);
 }
 function handleCheckbox(idToChecked,id){
   setItems(items.map(item=> {
@@ -43,7 +37,7 @@ return(
     <Form onAdditem={handleAdd}/>
     <PackingList items={items} handleDelete={handleDelete} handleCheckbox={handleCheckbox}/>
     <Stats items={items}/>
-    <Sort items={items} handleSort={handleSort}/>
+    <Sort items={items} handleClear={handleClear}/>
   </Fragment>
 )
 
@@ -104,15 +98,30 @@ function Stats({items}){
     <div className="stats">{`You have ${numItems} items in your list and ${packeditem.length == 0? "0":percentagePackedItems}% has been Packed`}</div>
   )
 }
-function Sort({items,handleSort}){
+function Sort({items,handleClear}){
+const [sortValue,setSortValue] = useState("Input");
+    
+let sortItems;
+if(sortValue === 'Packed Items'){
+  sortItems = items.sort((a, b) => (a.packed === b.packed) ? 0 : (a.packed ? 1 : -1));
+}
+else if(sortValue === 'Description'){
+  sortItems = items.slice().sort((a, b) => a.search.localeCompare(b.search));
+}
+else if(sortValue === 'Input'){
+  sortItems = items;
+}
+
+
     return(
       <React.Fragment>
       <div className='sort_wrapper'>
-        <select onChange={(e)=>handleSort(items,e.target.value)}>
+        <select value={sortValue} onChange={(e)=>setSortValue(e.target.value)}>
           <option value="Input">Sort it by List</option>
           <option value="Description">Sort it by Description</option>
           <option value="Packed Items">Sort it by Packed Items</option>
         </select>
+        <button onClick={()=>{handleClear()}}>Clear all the list</button>
       </div>
       </React.Fragment>
     )
